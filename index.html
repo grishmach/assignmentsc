@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;1,100;1,300;1,400;1,500;1,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="index.css" />
+    <script src="https://unpkg.com/react@17.0.0/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17.0.0/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone@7.12.4/babel.js"></script>
+  </head>
+  <body>
+    <div id="root">
+      <form id="addUserForm">
+        <div class="p-4 bg-container">
+          <h1 class="form-heading">sign up</h1>
+
+          <label for="email">Email</label>
+          <input
+            id="email"
+            type="text"
+            class="form-control"
+            placeholder="Enter email"
+          />
+          <p id="emailErrMsg" class="error-message"></p>
+
+          <label for="newPassword">Password</label>
+          <input
+            id="newPassword"
+            type="password"
+            class="form-control"
+            placeholder="Enter Password"
+          />
+          <p id="newPasswordErrMsg" class="error-message"></p>
+
+          <div>
+            <button class="btn btn-primary">Submit</button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <script type="text/javascript" src="./index.js">
+          let addUserFormEl = document.getElementById("addUserForm");
+      addUserFormEl.addEventListener("submit", function(event) {
+          event.preventDefault()
+      })
+      let formdata = {
+          name: "",
+          email: "",
+
+      };
+
+      let nameEl = document.getElementById("name");
+      let nameErrMsgEl = document.getElementById("nameErrMsg");
+
+      nameEl.addEventListener("change", function(event) {
+          if (event.target.value === "") {
+              nameErrMsgEl.textContent = "Required*"
+          } else {
+              nameErrMsgEl.textContent = "";
+          }
+          formdata.name = event.target.value
+      })
+
+      let emailEl = document.getElementById("email");
+      let emailErrMsgEl = document.getElementById("emailErrMsg");
+
+
+      emailEl.addEventListener("change", function(event) {
+          if (event.target.value === "") {
+              emailErrMsgEl.textContent = "Required*";
+          } else {
+              emailErrMsgEl.textContent = "";
+          }
+
+          formdata.email = event.target.value;
+      });
+
+      let newPasswordEl = document.getElementById("newPassword")
+      let newPasswordErrMsgEl = document.getElementById("newPasswordErrMsg")
+
+      let validatePassword = function() {
+          if (newPasswordEl.value === "") {
+              newPasswordErrMsgEl.textContent = "Required*"
+          } else {
+              newPasswordErrMsgEl.textContent = ""
+          }
+      }
+
+      function validateFormdata(formdata) {
+          let {
+              name,
+              email
+          } = formdata;
+          if (name === "") {
+              nameErrMsgEl.textContent = "Required*";
+          }
+          if (email === "") {
+              emailErrMsgEl.textContent = "Required*"
+          }
+      }
+
+      function submitformdata(formdata) {
+          let option = {
+              method: "POST",
+              headers: {
+                  "content-type": "application/json",
+                  Accept: "application/json",
+                  Authorization: "Bearer  "
+              },
+              body: JSON.stringify(formdata)
+          };
+
+          let url = "https://gorest.co.in/public-api/users"
+
+          fetch(url, option)
+              .then(function(response) {
+                  return response.json();
+              })
+              .then(function(jsonData) {
+                  console.log(jsonData);
+                  if (jsonData.code === 422) {
+                      if (jsonData.data[0].message === "has already been taken") {
+                          emailErrMsgEl.textContent = "Email Already Exists"
+                      }
+                  }
+              })
+      }
+      addUserFormEl.addEventListener("submit", function(event) {
+          event.preventDefault();
+          validatePassword()
+          validateFormdata(formdata);
+          submitformdata(formdata)
+      })
+    </script>
+  </body>
+</html>
